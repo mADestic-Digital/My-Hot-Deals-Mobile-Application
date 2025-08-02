@@ -1,3 +1,3 @@
-import NextAuth from "@/lib/auth"
+import NextAuthHandler from "@/lib/auth"
 
-export { NextAuth as GET, NextAuth as POST }
+export { NextAuthHandler as GET, NextAuthHandler as POST }
