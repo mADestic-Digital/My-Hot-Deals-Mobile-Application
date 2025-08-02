@@ -1,22 +1,45 @@
 'use client';
 
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogin: (email: string, password: string) => void;
 }
 
-export default function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin(email, password);
-    setEmail('');
-    setPassword('');
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+        callbackUrl: '/'
+      });
+
+      if (result?.error) {
+        setError('Invalid email or password');
+      } else {
+        // Success - close modal and clear form
+        setEmail('');
+        setPassword('');
+        onClose();
+      }
+    } catch (error) {
+      setError('An error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -55,6 +78,13 @@ export default function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Error Message */}
+          {error && (
+            <div className="p-3 rounded-md bg-red-50 border border-red-200">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
           {/* Email Field */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -67,7 +97,8 @@ export default function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900"
+              disabled={isLoading}
+              className="w-full px-3 py-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900 disabled:opacity-50"
             />
           </div>
 
@@ -83,7 +114,8 @@ export default function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900"
+              disabled={isLoading}
+              className="w-full px-3 py-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900 disabled:opacity-50"
             />
           </div>
 
@@ -100,9 +132,10 @@ export default function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps
           {/* Login Button */}
           <button
             type="submit"
-            className="w-full bg-blue-900 text-white py-3 px-4 rounded-md font-medium hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:ring-offset-2 transition-colors"
+            disabled={isLoading}
+            className="w-full bg-blue-900 text-white py-3 px-4 rounded-md font-medium hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {isLoading ? 'Signing in...' : 'Login'}
           </button>
         </form>
       </div>

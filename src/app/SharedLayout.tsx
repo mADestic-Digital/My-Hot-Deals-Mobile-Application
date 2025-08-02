@@ -1,64 +1,57 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import Navbar from '../components/Navbar';
 import LoginModal from '../components/LoginModal';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 interface SharedLayoutProps {
   children: React.ReactNode;
+  requireAuth?: boolean;
 }
 
-export default function SharedLayout({ children }: SharedLayoutProps) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+export default function SharedLayout({ children, requireAuth = false }: SharedLayoutProps) {
+  const { data: session, status } = useSession();
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [userInitial, setUserInitial] = useState('U');
 
-  const handleLoginClick = () => {
+  const handleLoginClick = useCallback(() => {
     setShowLoginModal(true);
-  };
+  }, []);
 
   const handleCloseModal = () => {
     setShowLoginModal(false);
   };
 
-  const handleLogin = (email: string, password: string) => {
-    // Here you would typically make an API call to authenticate
-    console.log('Login attempt:', { email, password });
-    
-    // For demo purposes, let's simulate a successful login
-    // Extract first letter of email for user initial
-    const initial = email.charAt(0).toUpperCase();
-    setUserInitial(initial);
-    setIsLoggedIn(true);
-    setShowLoginModal(false);
-    
-    // In a real app, you'd handle authentication properly
-    alert('Login successful! (This is just a demo)');
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUserInitial('U');
-    alert('Logged out successfully!');
-  };
+  // Get user initial from session
+  const userInitial = session?.user?.name?.charAt(0).toUpperCase() || session?.user?.email?.charAt(0).toUpperCase() || 'A';
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar 
-        isLoggedIn={isLoggedIn}
+        isLoggedIn={!!session}
         userInitial={userInitial}
         onLoginClick={handleLoginClick}
         onLogout={handleLogout}
       />
       
       <main>
-        {children}
+        {requireAuth ? (
+          <ProtectedRoute onRequestLogin={handleLoginClick}>
+            {children}
+          </ProtectedRoute>
+        ) : (
+          children
+        )}
       </main>
 
       <LoginModal 
         isOpen={showLoginModal}
         onClose={handleCloseModal}
-        onLogin={handleLogin}
       />
     </div>
   );
