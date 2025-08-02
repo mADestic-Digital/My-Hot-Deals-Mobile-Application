@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
-import AuthSessionProvider from "@/components/SessionProvider";
+import AuthSessionProvider from "@/auth-configs/SessionProvider";
 
 const nunito = Nunito({
   variable: "--font-nunito",

@@ -98,7 +98,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
-              className="w-full px-3 py-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900 disabled:opacity-50"
+              className="w-full px-3 py-3 border border-gray-300 rounded-md bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900 disabled:opacity-50"
             />
           </div>
 
@@ -115,7 +115,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
-              className="w-full px-3 py-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900 disabled:opacity-50"
+              className="w-full px-3 py-3 border border-gray-300 rounded-md bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900 disabled:opacity-50"
             />
           </div>
 

@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import Navbar from '../components/Navbar';
 import LoginModal from '../components/LoginModal';
-import ProtectedRoute from '../components/ProtectedRoute';
+import ProtectedRoute from '../auth-configs/ProtectedRoute';
 
 interface SharedLayoutProps {
   children: React.ReactNode;
