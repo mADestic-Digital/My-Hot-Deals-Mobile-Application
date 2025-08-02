@@ -2,6 +2,28 @@ import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaClient } from "@prisma/client"
 import bcryptjs from "bcryptjs"
+import type { JWT } from "next-auth/jwt"
+import type { Session } from "next-auth"
+import type { User } from "next-auth"
+
+// Extend the built-in session types
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string
+      email: string
+      name: string
+    }
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id?: string
+    email?: string
+    name?: string
+  }
+}
 
 const prisma = new PrismaClient()
 
@@ -61,15 +83,15 @@ const authOptions = {
     signIn: "/", // Redirect to home page where your modal is
   },
   callbacks: {
-    async jwt({ token, user }: any) {
+    async jwt({ token, user }: { token: JWT; user?: User }) {
       if (user) {
         token.id = user.id
-        token.email = user.email
-        token.name = user.name
+        token.email = user.email as string
+        token.name = user.name as string
       }
       return token
     },
-    async session({ session, token }: any) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (token) {
         session.user.id = token.id as string
         session.user.email = token.email as string
