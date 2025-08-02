@@ -66,8 +66,7 @@ const authOptions = {
           return {
             id: admin.id,
             email: admin.email,
-            name: admin.name,
-            image: admin.image
+            name: admin.name
           }
         } catch (error) {
           console.error("Authentication error:", error)
